@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int initialData(int max, int min){
+  return rand() % (max + 1 - min) + min;
+}
+
+int main(){
+
+//declare and initialize variables
+  FILE *dataIn = fopen("data.pg","rt");
+  FILE *dataOut = fopen("data.pg","wt");
+  FILE *recordIn = fopen("record.txt","rt");
+  FILE *recordOut = fopen("record.txt","wt");
+  int guess,counter,size,sumTries,averTries,averNums,sumNums;
+  counter = 1;
+  int data[11];
+  data[0]=0;
+  int tries[6];
+  tries[0]=0;
+
+//generate 10 random numbers if Data.pg is empty
+//if it's not empty, put the numbers in Data.pg into an array
+  FILE *fp = fopen("Data.pg","r");
+  if (NULL != fp) {
+    fseek (fp, 0, SEEK_END);
+    int size = ftell(fp);
+    if (0 == size) {
+      for(int i=0; i<10; i++){
+        data[i] = initialData(50,1);
+        //to do the encryption, I add every number by 3 when it is printed into data.pg
+        fprintf(dataOut,"%d",data[i]+3);
+        sumNums += data[i];
+      }
+      averNums = sumNums/10;
+    }
+    else{
+      for(int i=0; i<10; i++){
+        fscanf(dataIn,"%d",&data[i]);
+        //to do the decryption, I subtract every number by 3 when it is scanned out of data.pg
+        data[i]=data[i]-3;
+        sumNums += data[i];
+      }
+      averNums = sumNums/10;
+    }
+  }
+//calculate average tries of the previous five players
+//first copy the record file into an array
+//if it is empty, initialize the file
+FILE *fp1 = fopen("record.txt","r");
+  if (NULL != fp1) {
+    fseek (fp1, 0, SEEK_END);
+    int size1 = ftell(fp1);
+    if (0 == size1) {
+      for(int n=0; n<5; n++){
+        fprintf(recordOut,"%d",initialData(3,1));
+      }
+      for(int j=0; j<5; j++){
+        fscanf(recordIn,"%d",&tries[j]);
+        sumTries += tries[j];
+      }
+      averTries = sumTries/5;
+    }
+    else{
+      for(int j=0; j<5; j++){
+      fscanf(recordIn,"%d",&tries[j]);
+      sumTries += tries[j];
+    }
+      averTries = sumTries/5;
+    }
+  }
+
+//start guessing numbers
+  printf("Guess Number?\n");
+  while(counter<=3){
+    scanf("%d",&guess);
+    if(guess<((float)2/3)*averNums*(1-(float)1/10)||guess>(2/3)*averNums*(1+(float)1/10)){
+      printf("Incorrect guess. Try again.\n");
+    }
+    else{
+      //add the player's try to tries[] and generate a new file by discarding the first index of tries[]
+      tries[5]=counter;
+      sumTries = 0;
+      for(int t=0; t<5; t++){
+        sumTries = sumTries + tries[t];
+      }
+      averTries = sumTries/5;
+      printf("Well Done. You took %d tries to guess. Average guess is %d.",counter,averTries);
+      //now update the record file
+      for(int n=0; n<5; n++){
+        fprintf(recordOut,"%d",tries[n+1]);
+      }
+      break;
+    }
+    }
+    //update the data.pg file 
+    //update data[] first
+    data[10]=guess;
+    sumTries = 0;
+    for(int k=0; k<10; k++){
+      //to do the encryption, I add every number by 3 when it is printed into data.pg
+      fprintf(dataOut,"%d",data[k+1]+3);
+      sumTries += data[k+1];
+    }
+    averTries = sumTries/10;
+    counter++;
+  }
+  //if the loop is finished,it means the player fails
+  printf("You have run out of chances. You fail.\n");
+  return 0;
+}

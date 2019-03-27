@@ -1,0 +1,73 @@
+#!/bin/bash
+
+#assign variables names
+NewProject=$0
+if [ $# -ge 3 ]
+then
+        path=$1
+        project_name=$2
+        file_names=${@:3}
+elif [ $# -eq 2]
+then
+        project_name=$1
+        file_names=$2
+        path=""
+else
+        echo 'You command is malformed. Type in: ./NewProject2 path project_name file_names'
+fi
+
+#checks if the project name is missing
+if [ "$project_name" = "" ]
+then
+        echo 'Project name is missing. Type in: ./NewProject2 path project_name file_names'
+        exit
+fi
+
+if [ "$file_names" = "" ]
+then
+        echo 'Filenames are missing. Type in: ./NewProject2 path project_name file_names'
+        exit
+fi
+
+#checks if the user has entered a path and if yes then it checks if it is of thecorrect form
+if [ "$path" != "" ]
+then
+        if [ -d "$path" ]
+        then :
+        else
+                echo 'Your path name is malformed. Type in: NewProject path project_name'
+                exit
+        fi
+fi
+
+#makes all the directories
+if [ "$path" != "" ]
+then
+        mkdir "$path"/"$project_name"
+        mkdir "$path"/"$project_name"/docs
+        mkdir "$path"/"$project_name"/source
+        mkdir "$path"/"$project_name"/backup
+        mkdir "$path"/"$project_name"/archive
+        cd "$path"/"$project_name"/source
+else
+        mkdir "$project_name"
+        mkdir "$project_name"/docs
+        mkdir "$project_name"/source
+        mkdir "$project_name"/backup
+        mkdir "$project_name"/archive
+        cd "$project_name"/source
+fi
+
+#creates a file named makefile in source and makes it executable
+touch Makefile
+chmod +x Makefile
+
+echo "myprog: prog3.o lib.o
+        gcc -o myprog prog3.o lib.o
+prog3.o: prog3.c prog3.h
+        gcc -c prog3.c
+lib.o: lib.c lib.h
+        gcc -c lib.c
+" > Makefile
+
+exit

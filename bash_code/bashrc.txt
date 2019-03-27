@@ -1,0 +1,22 @@
+#!/bin/bash
+# edited in .bashrc
+# .bashrc
+
+# Source global definitions
+if [ -f /usr/socs/Profile ]; then
+        . /usr/socs/Profile
+fi
+
+
+# User specific aliases and functions
+
+echo "Welcome to the terminal!"
+PS1="[\u \w] Hey! Let's start -->"
+alias lla='ls -l -a'
+
+# Identify whether my peer group are logged into the computer
+echo "your friends logged in:"
+who|grep 'sma58\|jcao25\|kluo4'
+
+#append the login script to the text file
+date >> MyLoginHistory.txt

@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <stdlib.h>
+int main(int argc, char *argv[]){
+  FILE *in = fopen(argv[1],"rt");
+  FILE *out = fopen(argv[1],"wt");
+  if(NULL != in){
+    fseek (in, 0, SEEK_END);
+    int size = ftell(in);
+    char sentence[size];
+    for(int i=0; i<size; i++){
+      fscanf(in,"%c",&sentence[i]);
+    }
+    for(int k=0; k<size; k++){
+      if(sentence[k]==32)
+        fprintf(out,"%c",sentence[k]);
+      else if ((sentence[k] - atoi(argv[2]))>=65)
+        fprintf(out,"%c",(char)(sentence[k]-atoi(argv[2])));
+      else
+        fprintf(out,"%c",(char)('c' + 26 - atoi(argv[2])));
+   }
+ }
+  fclose(in);
+  fclose(out);
+  return 0;
+}
